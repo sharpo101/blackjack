@@ -2,10 +2,11 @@ import random
 suits = ('Hearts', 'Diamonds', 'Spades', 'Clubs')
 ranks = ('Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace')
 values = {'Two':2, 'Three':3, 'Four':4, 'Five':5, 'Six':6, 'Seven':7, 'Eight':8, 
-            'Nine':9, 'Ten':10, 'Jack':10, 'Queen':10, 'King':10, 'Ace':11}
+            'Nine':9, 'Ten':10, 'Jack':10, 'Queen':10, 'King':10, 'Ace':0}
 
 playing = True
 no_bust = True
+game_on = True
 
 class Card:
     
@@ -102,7 +103,7 @@ def hit_or_stand(deck,hand):
     
     while hitorstand:
         try:
-            player_choice = input('Would you like to hit or stand? ')
+            player_choice = input('\nWould you like to hit or stand? ')
             while player_choice not in options:
                 print('Please choose hit or stand')
                 player_choice = input('Would you like to hit or stand? ')
@@ -125,6 +126,7 @@ def hit_or_stand(deck,hand):
             
 
 def show_some(player,dealer):
+    print('\n-------------------')
     print('\nyour cards:')
     for card in player:
         print(card)
@@ -133,7 +135,8 @@ def show_some(player,dealer):
     print(dealer.cards[1])
         
 def show_all(player,dealer):
-    print(f'\nyour cards are')
+    print('\n-------------------')
+    print(f'\nyour cards:')
     for card in player:
         print(card)
  
@@ -146,6 +149,7 @@ def player_busts(player,chips):
     global no_bust
     if player.value > 21:
         chips.lose_bet()
+        print('\n-------------------')
         print('\nYou Bust!')
         playing = False
         no_bust = False
@@ -154,12 +158,14 @@ def player_wins(player,dealer,chips):
     global no_bust
     if player.value > dealer.value and player.value <= 21:
         chips.win_bet()
+        print('\n-------------------')
         print('\nYou win!')
         no_bust = False
 
 def dealer_busts(dealer,chips):
     global no_bust
     if dealer.value > 21:
+        print('\n-------------------')
         print('\nDealer busts!')
         chips.win_bet()
         no_bust = False
@@ -167,6 +173,7 @@ def dealer_busts(dealer,chips):
 def dealer_wins(player,dealer,chips):
     global no_bust
     if dealer.value > player.value and dealer.value <= 21:
+        print('\n-------------------')
         print('\nDealer wins!')
         chips.lose_bet()
         no_bust = False
@@ -174,10 +181,12 @@ def dealer_wins(player,dealer,chips):
 def push(player,dealer):
     global no_bust
     if player.value == dealer.value:
+        print('\n-------------------')
         print('\nPUSH')
         no_bust = False
 
 def game_over():
+    global game_on
     gameover = True
     while gameover:
         try:
@@ -199,7 +208,11 @@ def game_over():
 
 def new_hand():
     player_hand.cards = []
+    player_hand.value = 0
+    player_hand.aces = 0
     dealer_hand.cards = []
+    dealer_hand.value = 0
+    dealer_hand.aces = 0
     for i in range(2):
         player_hand.add_card(game_deck.deal_one())
     for i in range(2):
@@ -219,7 +232,9 @@ def game_start():
     player_bet = Chips()
 
 def blackjack():
+    global game_on
     game_on = True
+
     game_start()
     
     game_deck.shuffle()
@@ -235,15 +250,13 @@ def blackjack():
 
         take_bet()
 
-        show_some(player_hand.cards,dealer_hand)
-
         while playing:
-
-            hit_or_stand(game_deck,player_hand)
 
             player_hand.adjust_for_aces()
 
             show_some(player_hand.cards,dealer_hand)
+
+            hit_or_stand(game_deck,player_hand)
 
             player_busts(player_hand,player_bet)
             
@@ -266,7 +279,6 @@ def blackjack():
             
             push(player_hand,dealer_hand)
             
-            break
 
         print(f'\nYour chip total is: ${player_bet.total}')
 
